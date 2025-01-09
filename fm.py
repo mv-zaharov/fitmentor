@@ -78,8 +78,19 @@ async def process_file(file: UploadFile = File(...)):
         # Удаляем все временные изображения из папки даже при ошибках
         shutil.rmtree(TEMP_PIC_FOLDER, ignore_errors=True)
         os.makedirs(TEMP_PIC_FOLDER, exist_ok=True)
+        
+    #Проверяем, создан ли файл
+    if not os.path.exists(output_video_path):
+        raise HTTPException(status_code=500, detail="Processed video file not found")
 
-    return JSONResponse(content={"message": "File processed successfully"})
+    #Возвращаем обработанный видеофайл в ответе
+    return FileResponse(
+        path=output_video_path,
+        media_type="video/mp4",
+        filename=f"ok_{file.filename}"  #Файл будет загружаться с префиксом "ok_"
+    )        
+
+    #return JSONResponse(content={"message": "File processed successfully"})
 
 
 @app.get("/process/")
